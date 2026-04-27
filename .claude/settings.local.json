@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw -q -DskipTests compile)",
+      "Bash(./mvnw -DskipTests compile)",
+      "Bash(./mvnw clean *)",
+      "Bash(npx --no-install ng build)",
+      "Bash(git add *)"
+    ]
+  }
+}

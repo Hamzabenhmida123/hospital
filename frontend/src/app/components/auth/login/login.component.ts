@@ -16,10 +16,10 @@ export class LoginComponent implements OnInit {
   submitted = false;
   error = '';
   readonly demoAccounts = [
-    { label: 'Admin', email: 'admin@example.com', password: 'admin123' },
-    { label: 'Patient', email: 'john@example.com', password: 'password123' },
-    { label: 'Doctor', email: 'doctor@example.com', password: 'password123' },
-    { label: 'Nurse', email: 'nurse@example.com', password: 'password123' }
+    { label: 'Admin',   name: 'Admin User',  email: 'admin@example.com',  password: 'admin123',    icon: 'shield' },
+    { label: 'Patient', name: 'John Doe',    email: 'john@example.com',   password: 'password123', icon: 'user' },
+    { label: 'Doctor',  name: 'Dr. Stone',   email: 'doctor@example.com', password: 'password123', icon: 'stethoscope' },
+    { label: 'Nurse',   name: 'Nina Brooks', email: 'nurse@example.com',  password: 'password123', icon: 'heart' }
   ];
 
   constructor(
@@ -69,6 +69,14 @@ export class LoginComponent implements OnInit {
   fillDemoAccount(email: string, password: string): void {
     this.loginForm.patchValue({ email, password });
     this.error = '';
+  }
+
+  /** One-click sign-in: fill the form with a demo account and submit immediately. */
+  loginAs(email: string, password: string): void {
+    this.loginForm.patchValue({ email, password });
+    this.submitted = false;
+    this.error = '';
+    this.onSubmit();
   }
 }
 

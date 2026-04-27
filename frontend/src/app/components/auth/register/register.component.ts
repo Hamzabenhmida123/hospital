@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService, RequestedRole } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -16,6 +16,13 @@ export class RegisterComponent implements OnInit {
   loading = false;
   submitted = false;
   error = '';
+  pendingMessage = '';
+
+  readonly roleOptions: { value: RequestedRole; label: string; description: string }[] = [
+    { value: 'PATIENT', label: 'Patient', description: 'Book appointments with our doctors.' },
+    { value: 'DOCTOR',  label: 'Doctor',  description: 'Manage availability and accept patient bookings.' },
+    { value: 'NURSE',   label: 'Nurse',   description: 'See appointments assigned to you.' }
+  ];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -29,7 +36,8 @@ export class RegisterComponent implements OnInit {
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', Validators.required]
+      confirmPassword: ['', Validators.required],
+      requestedRole: ['PATIENT' as RequestedRole, Validators.required]
     }, { validators: this.passwordMatchValidator });
   }
 
@@ -68,6 +76,7 @@ export class RegisterComponent implements OnInit {
   onSubmit(): void {
     this.submitted = true;
     this.error = '';
+    this.pendingMessage = '';
 
     if (this.registerForm.invalid) {
       return;
@@ -83,6 +92,11 @@ export class RegisterComponent implements OnInit {
     this.authService.register(this.registerForm.value).subscribe({
       next: (response) => {
         this.loading = false;
+        if (response.approvalStatus === 'PENDING') {
+          this.pendingMessage = response.message
+            || 'Your account is pending administrator approval.';
+          return;
+        }
         this.router.navigateByUrl(this.authService.getDefaultRoute(response));
       },
       error: (error) => {
